@@ -1,4 +1,4 @@
-
+import random
 
 class User:
     def __init__(self, name):
@@ -47,8 +47,28 @@ class SocialGraph:
         # !!!! IMPLEMENT ME
 
         # Add users
+        # call addUser() until our number of users is numUsers
+        for i in range(numUsers):
+            self.addUser(f"User {i+1}")
 
         # Create friendships
+        # Generate a list of all possible friendships
+        possibleFriendships = []
+        #Avoid duplicates by ensuring the first ID is smaller than the second
+        for userID in self.users:
+            for friendID in range(userID + 1, self.lastID + 1):
+                possibleFriendships.append( (userID, friendID) )
+
+        print(possibleFriendships)
+        # Shuffle the list
+        random.shuffle(possibleFriendships)
+
+        # Slice off totalFriendships from the front, create friendships
+        for i in range(avgFriendships * numUsers // 2):
+            friendship = possibleFriendships[i]
+            self.addFriendship( friendship[0], friendship[1] )
+
+        print(f"Friendships to create: {(avgFriendships * numUsers // 2) * 2}")
 
     def getAllSocialPaths(self, userID):
         """
@@ -61,6 +81,24 @@ class SocialGraph:
         """
         visited = {}  # Note that this is a dictionary, not a set
         # !!!! IMPLEMENT ME
+        
+        # start a queue and add starting node
+        q = []
+        q.append(userID)
+        # initialize first path
+        visited[userID] = [userID]
+        # while queue is not empty
+        while len(q) > 0:
+            # grab first element from queue
+            current = q.pop(0)
+            # for each friendship of current
+            for friend in self.friendships[current]:
+                # if friend has not been visited/is not key in visited dictionary
+                if friend not in visited:
+                    # add key to visited dictionary with existing path from userID plus the friend ID
+                    visited[friend] = visited[current] + [friend]
+                    # add friend to queue
+                    q.append(friend)
         return visited
 
 
