@@ -24,6 +24,7 @@ player = Player("Name", world.startingRoom)
 # Fill this out
 traversalPath = ['n','n']
 
+# FIFO
 class Queue():
     def __init__(self):
         self.queue = []
@@ -37,7 +38,8 @@ class Queue():
     def size(self):
         return len(self.queue)
 
-class Stack():
+# LIFO
+class Stack(): 
     def __init__(self):
         self.stack = []
     def push(self, value):
@@ -50,13 +52,91 @@ class Stack():
     def size(self):
         return len(self.stack)
 
-        
+
 
 
 # TRAVERSAL TEST
 visited_rooms = set()
 player.currentRoom = world.startingRoom
-visited_rooms.add(player.currentRoom)
+
+#visited_rooms.add(player.currentRoom)
+
+
+
+# DFT
+s = Stack()
+s.push(player.currentRoom)
+
+while s.size() > 0:
+    room = s.pop()
+
+    if room not in visited_rooms:
+        visited_rooms.add(room)
+
+        for direction in room.getExits():
+            if direction == 'n':
+                s.push(room.n_to)
+                traversalPath.append(direction)
+            elif direction == 's':
+                s.push(room.s_to)
+                traversalPath.append(direction)
+            elif direction == 'w':
+                s.push(room.w_to)
+                traversalPath.append(direction)
+            else:
+                s.push(room.e_to)
+                traversalPath.append(direction)
+
+def dft_recursive(room):
+    """
+    Print each vertex in depth-first order
+    beginning from starting_vertex.
+    This should be done using recursion.
+    """
+
+    global visited_rooms
+
+    # Check if we have visited room, if not, add, if so, backtrack and check other nodes
+    if room not in visited_rooms:
+        visited_rooms.add(room)
+
+        for direction in room.getExits():
+            if direction == 'n':
+                traversalPath.append(direction)
+                dft_recursive(room.n_to)
+            elif direction == 's':
+                traversalPath.append(direction)
+                dft_recursive(room.s_to)
+            elif direction == 'w':
+                traversalPath.append(direction)
+                dft_recursive(room.w_to)
+            else:
+                traversalPath.append(direction)
+                dft_recursive(room.e_to)
+
+def dft_recursive_old(self, starting_vertex, visited=None):
+        """
+        Print each vertex in depth-first order
+        beginning from starting_vertex.
+        This should be done using recursion.
+        """
+        if visited is None:
+            visited = set()
+            print('dft recursive start')
+        # add vertex parameter to visited set
+        visited.add(starting_vertex)
+        # print vertex
+        print(starting_vertex, visited)
+
+        if len(visited) == len(self.vertices):
+            print('dft recursive end')
+
+        # look at connected edges to current vertex, if it has not been visited, recursion
+        for neighbor in self.vertices[starting_vertex]:
+            if neighbor not in visited:
+                self.dft_recursive(neighbor, visited)
+
+print("HERE: ", traversalPath)
 
 for move in traversalPath:
     player.travel(move)
@@ -80,3 +160,4 @@ while True:
         player.travel(cmds[0], True)
     else:
         print("I did not understand that command.")
+
