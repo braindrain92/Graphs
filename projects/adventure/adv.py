@@ -59,33 +59,69 @@ class Stack():
 visited_rooms = set()
 player.currentRoom = world.startingRoom
 
-#visited_rooms.add(player.currentRoom)
 
 
 
-# DFT
+# DFS
 s = Stack()
 s.push(player.currentRoom)
 
 while s.size() > 0:
     room = s.pop()
 
+    # We only want to travel to new rooms
     if room not in visited_rooms:
         visited_rooms.add(room)
 
-        for direction in room.getExits():
-            if direction == 'n':
+        # Get exits for each room
+        # Travel to each room
+        for exit_direction in room.getExits():
+            if exit_direction == 'n':
                 s.push(room.n_to)
-                traversalPath.append(direction)
-            elif direction == 's':
+                traversalPath.append(exit_direction)
+            elif exit_direction == 's':
                 s.push(room.s_to)
-                traversalPath.append(direction)
-            elif direction == 'w':
+                traversalPath.append(exit_direction)
+            elif exit_direction == 'w':
                 s.push(room.w_to)
-                traversalPath.append(direction)
+                traversalPath.append(exit_direction)
             else:
                 s.push(room.e_to)
-                traversalPath.append(direction)
+                traversalPath.append(exit_direction)
+
+    def dfs(self, starting_vertex, destination_vertex):
+        """
+        Return a list containing a path from
+        starting_vertex to destination_vertex in
+        depth-first order.
+        """
+        print('dfs start')
+        # Create an empty queue and enqueue A PATH TO the starting vertex ID
+        s = Stack()
+        s.push([starting_vertex])
+        # Create a Set to store visited vertices
+        visited = set()
+        # While the queue is not empty...
+        while s.size() > 0:
+            # Dequeue the first PATH
+            path = s.pop()
+            # Grab the last vertex from the PATH
+            last = path[-1]
+
+            # If that vertex has not been visited...
+            if last not in visited:
+                # CHECK IF IT'S THE TARGET
+                if last == destination_vertex:
+                    # IF SO, RETURN PATH
+                    return f"{path}\ndfs end"
+                # Mark it as visited...
+                visited.add(last)
+                # Then add A PATH TO its neighbors to the back of the queue
+                for neighbor in self.vertices[last]:
+                    # COPY THE PATH
+                    # APPEND THE NEIGHOR TO THE BACK
+                    s.push(path + [neighbor])
+
 
 def dft_recursive(room):
     """
@@ -93,8 +129,6 @@ def dft_recursive(room):
     beginning from starting_vertex.
     This should be done using recursion.
     """
-
-    global visited_rooms
 
     # Check if we have visited room, if not, add, if so, backtrack and check other nodes
     if room not in visited_rooms:
@@ -136,7 +170,6 @@ def dft_recursive_old(self, starting_vertex, visited=None):
             if neighbor not in visited:
                 self.dft_recursive(neighbor, visited)
 
-print("HERE: ", traversalPath)
 
 for move in traversalPath:
     player.travel(move)
